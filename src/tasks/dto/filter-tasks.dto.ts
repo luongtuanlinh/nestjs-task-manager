@@ -1,3 +1,6 @@
+import { IsOptional, NotEquals } from "class-validator";
+
 export class FilterTasksDto {
-  search?: string;
+  @IsOptional()
+  search: string;
 }
