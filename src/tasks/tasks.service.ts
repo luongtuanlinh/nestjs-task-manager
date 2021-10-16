@@ -12,7 +12,12 @@ export class TasksService {
   constructor(
     @InjectRepository(TasksRepository)
     private taskRepository: TasksRepository,
-  ) {}
+  ) { }
+
+  async getTasks(): Promise<Task[]> {
+    const tasks = await this.taskRepository.find();
+    return tasks;
+  }
 
   async getTaskById(id: string): Promise<Task> {
     const task = await this.taskRepository.findOne(id);
@@ -22,45 +27,32 @@ export class TasksService {
     return task;
   }
 
-  // getAllTasks(): Task[] {
-  //   return this.tasks;
-  // }
-  // getTaskById(id: string): Task {
-  //   const task = this.tasks.find((task) => task.id === id);
-  //   if (!task) {
-  //     throw new NotFoundException();
-  //   }
-  //   return task;
-  // }
+  createTask(createTaskDto: CreateTaskDto): Promise<Task> {
+    return this.taskRepository.createTask(createTaskDto);
+  }
+
+  async deleteTaskById(id: string) {
+    const result = await this.taskRepository.delete(id);
+    if (!result.affected) {
+      throw new NotFoundException();
+    }
+  }
+
+  async updateTask(id: string, updateTaskDto: UpdateTaskDto): Promise<Task> {
+    const { title, description, status } = updateTaskDto;
+    const task = await this.getTaskById(id);
+    console.log(task);
+    task.title = title ?? task.title;
+    task.description = description ?? task.description;
+    task.status = status ?? task.status;
+    this.taskRepository.save(task);
+    return task;
+  }
+
   // searchByTitleOrDescription(search: string): Task[] {
   //   return this.tasks.filter(
   //     (task) =>
   //       task.title.includes(search) || task.description.includes(search),
   //   );
-  // }
-  // createTask(createTaskDto: CreateTaskDto) {
-  //   const { title, description } = createTaskDto;
-  //   const task = {
-  //     id: uuid(),
-  //     title,
-  //     description,
-  //     status: TaskStatus.OPEN,
-  //   };
-  //   this.tasks.push(task);
-  //   return task;
-  // }
-  // updateTask(id: string, updateTaskDto: UpdateTaskDto): Task {
-  //   const { title, description, status } = updateTaskDto;
-  //   const task = this.getTaskById(id);
-  //   task.title = title ?? task.title;
-  //   task.description = description ?? task.description;
-  //   task.status = status ?? task.status;
-  //   return task;
-  // }
-  // deleteTaskById(id: string): Task {
-  //   const taskIndex = this.tasks.findIndex((task) => task.id === id);
-  //   const deletedTask = this.tasks[taskIndex];
-  //   this.tasks.splice(taskIndex, 1);
-  //   return deletedTask;
   // }
 }
