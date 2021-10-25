@@ -1,7 +1,6 @@
 import { EntityRepository, Repository } from 'typeorm';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { FilterTasksDto } from './dto/filter-tasks.dto';
-import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './task.entity';
 import { TaskStatus } from './taskStatus.enum';
 
@@ -11,8 +10,13 @@ export class TasksRepository extends Repository<Task> {
     const { search } = filterTasks;
     const query = this.createQueryBuilder('task');
     if (search) {
-      query.andWhere('LOWER(task.title) LIKE LOWER(:searchTitle)', { searchTitle: `%${search}%` })
-        .orWhere('LOWER(task.description) LIKE LOWER(:searchDescription)', { searchDescription: `%${search}%` })
+      query
+        .andWhere('LOWER(task.title) LIKE LOWER(:searchTitle)', {
+          searchTitle: `%${search}%`,
+        })
+        .orWhere('LOWER(task.description) LIKE LOWER(:searchDescription)', {
+          searchDescription: `%${search}%`,
+        });
     }
     const tasks = await query.getMany();
     return tasks;
